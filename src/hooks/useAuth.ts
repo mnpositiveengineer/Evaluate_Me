@@ -53,7 +53,14 @@ export const useAuth = () => {
         setUser(session?.user ?? null);
         
         if (session?.user && session.user.id) {
-          await loadProfile(session.user);
+          // Only load profile if we don't already have one for this user
+          if (!profile || profile.id !== session.user.id) {
+            await loadProfile(session.user);
+          } else {
+            // User is the same and profile exists, just mark as initialized
+            setIsInitialized(true);
+            setLoading(false);
+          }
         } else {
           setProfile(null);
           setProfileCreationAttempted(new Set()); // Reset on sign out
